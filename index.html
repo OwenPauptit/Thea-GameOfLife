@@ -50,7 +50,11 @@
 
             console.log(xCell, yCell);
 
-            game.birthCell(yCell, xCell);
+            if (game.getCell(yCell, xCell) == 0){
+                game.birthCell(yCell, xCell);
+            } else {
+                game.killCell(yCell, xCell);
+            }
         }
 
         function gameLoop(){
