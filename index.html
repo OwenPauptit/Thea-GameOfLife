@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<body>
+        
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <button onclick="pause()">Pause</button>
+    <button onclick="resume()">Resume</button>
+
+    <script src="gameOfLifeGrid.js" ></script>
+
+    <script>
+
+        FPS = 1;
+        WIDTH = 10;
+        HEIGHT = 10;
+
+        window.onload = function(){
+            canvas = document.getElementById("canvas");
+            ctx = canvas.getContext("2d");
+            fillBlack();
+
+            game = new GameOfLifeGrid(WIDTH,HEIGHT);
+            game.birthCell(1,1);
+            game.birthCell(1,2);
+            game.birthCell(1,3);
+
+            paused = false;
+            
+            document.addEventListener("click", (e) => mouseClick(e.clientX, e.clientY));
+            var loop = setInterval(gameLoop, 1000/FPS);
+        }
+
+        function pause(){
+            paused = true;
+        }
+        function resume(){
+            paused = false;
+        }
+
+        function mouseClick(clientX, clientY){
+            console.log(clientX, clientY);
+            if (clientX > canvas.width || clientY > canvas.height){
+                return;
+            }
+            var xFraction = clientX / canvas.width;
+            var yFraction = clientY / canvas.height;
+            console.log(xFraction, yFraction);
+
+            var xCell = Math.floor(xFraction * game.width);
+            var yCell = Math.floor(yFraction * game.height);
+
+            console.log(xCell, yCell);
+
+            game.birthCell(yCell, xCell);
+        }
+
+        function gameLoop(){
+            fillBlack();
+            draw();
+            if (!paused){
+                game.nextIteration();
+            }
+        }
+
+        function fillBlack(){
+            ctx.fillStyle = "black";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+        }
+
+        function draw(){
+            ctx.fillStyle = "white";
+            var cellWidth = Math.floor(canvas.width / game.width);
+            var cellHeight = Math.floor(canvas.height / game.height);
+            for (var row = 0; row < game.height; row++){
+                for (var col = 0; col < game.width; col++){
+                    if (game.getCell(row,col) == 1){
+                        ctx.fillRect(col*cellWidth+1, row*cellHeight+1, cellWidth-2, cellHeight-2);
+                    }
+                }
+            }
+        }
+    </script>
+
+</body>
