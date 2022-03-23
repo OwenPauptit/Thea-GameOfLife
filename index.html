@@ -9,71 +9,85 @@
 
     <script>
 
+        // number of updates per second
         FPS = 1;
+
+        // width of the grid
         WIDTH = 10;
+
+        // height of the grid
         HEIGHT = 10;
 
         window.onload = function(){
             canvas = document.getElementById("canvas");
             ctx = canvas.getContext("2d");
-            fillBlack();
 
             game = new GameOfLifeGrid(WIDTH,HEIGHT);
+
+            // initial live cells (arbitrary)
             game.birthCell(1,1);
             game.birthCell(1,2);
             game.birthCell(1,3);
 
             paused = false;
             
+            // birth/kill mouseclick event listener
             document.addEventListener("click", (e) => mouseClick(e.clientX, e.clientY));
+
+            // game loop
             var loop = setInterval(gameLoop, 1000/FPS);
         }
 
+
+        // pauses the iterations
         function pause(){
             paused = true;
         }
+
+        // resumes the iterations
         function resume(){
             paused = false;
         }
 
+        // Called when mouse click is registered. Births or kills the cell the user has clicked on
         function mouseClick(clientX, clientY){
-            console.log(clientX, clientY);
+            // if the user has clicked outside of the canvas, ignore click
             if (clientX > canvas.width || clientY > canvas.height){
                 return;
             }
-            var xFraction = clientX / canvas.width;
-            var yFraction = clientY / canvas.height;
-            console.log(xFraction, yFraction);
 
-            var xCell = Math.floor(xFraction * game.width);
-            var yCell = Math.floor(yFraction * game.height);
+            var row = Math.floor(clientX * game.width / canvas.width);
+            var col = Math.floor(clientY * game.height / canvas.height);
 
-            console.log(xCell, yCell);
-
-            if (game.getCell(yCell, xCell) == 0){
-                game.birthCell(yCell, xCell);
+            if (game.getCell(col, row) == 0){
+                game.birthCell(col, row);
             } else {
-                game.killCell(yCell, xCell);
+                game.killCell(col, row);
             }
         }
 
+        // Game loop, draw to screen and then iterate the game
         function gameLoop(){
-            fillBlack();
             draw();
             if (!paused){
                 game.nextIteration();
             }
         }
 
+        // fills the canvas in black
         function fillBlack(){
             ctx.fillStyle = "black";
             ctx.fillRect(0,0,canvas.width,canvas.height);
         }
 
+        // draw the current state of the game
         function draw(){
+            fillBlack();
             ctx.fillStyle = "white";
+
             var cellWidth = Math.floor(canvas.width / game.width);
             var cellHeight = Math.floor(canvas.height / game.height);
+            
             for (var row = 0; row < game.height; row++){
                 for (var col = 0; col < game.width; col++){
                     if (game.getCell(row,col) == 1){
